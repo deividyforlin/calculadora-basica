@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Calculadora</title>
+  <style>
+    .calculator {
+      width: 300px;
+      margin: 50px auto;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      background-color: #f9f9f9;
+    }
+
+    .display {
+      width: 100%;
+      height: 50px;
+      margin-bottom: 20px;
+      padding: 10px;
+      font-size: 24px;
+      text-align: right;
+      border: 1px solid #ddd;
+      border-radius: 3px;
+      background-color: white;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    button {
+      padding: 15px;
+      font-size: 18px;
+      border: 1px solid #ddd;
+      border-radius: 3px;
+      background-color: white;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    button:hover {
+      background-color: #eee;
+    }
+
+    .operator {
+      background-color: #f0f0f0;
+    }
+
+    .equals {
+      background-color: #4CAF50;
+      color: white;
+    }
+
+    .equals:hover {
+      background-color: #45a049;
+    }
+
+    .clear {
+      background-color: #ff4444;
+      color: white;
+    }
+
+    .clear:hover {
+      background-color: #ff3333;
+    }
+  </style>
+</head>
+<body>
+  <div class="calculator">
+    <input type="text" class="display" id="display" readonly>
+    <div class="buttons">
+      <button onclick="clearDisplay()" class="clear">C</button>
+      <button onclick="appendToDisplay('(')">(</button>
+      <button onclick="appendToDisplay(')')">)</button>
+      <button onclick="appendToDisplay('/')" class="operator">÷</button>
+      
+      <button onclick="appendToDisplay('7')">7</button>
+      <button onclick="appendToDisplay('8')">8</button>
+      <button onclick="appendToDisplay('9')">9</button>
+      <button onclick="appendToDisplay('*')" class="operator">×</button>
+      
+      <button onclick="appendToDisplay('4')">4</button>
+      <button onclick="appendToDisplay('5')">5</button>
+      <button onclick="appendToDisplay('6')">6</button>
+      <button onclick="appendToDisplay('-')" class="operator">-</button>
+      
+      <button onclick="appendToDisplay('1')">1</button>
+      <button onclick="appendToDisplay('2')">2</button>
+      <button onclick="appendToDisplay('3')">3</button>
+      <button onclick="appendToDisplay('+')" class="operator">+</button>
+      
+      <button onclick="appendToDisplay('0')">0</button>
+      <button onclick="appendToDisplay('.')">.</button>
+      <button onclick="backspace()">⌫</button>
+      <button onclick="calculate()" class="equals">=</button>
+    </div>
+  </div>
+
+  <script>
+    let display = document.getElementById('display');
+    let firstNumber = '';
+    let operation = '';
+    let newNumber = true;
+
+    function appendToDisplay(value) {
+      if (display.value === '0' || newNumber) {
+        display.value = value;
+        newNumber = false;
+      } else {
+        display.value += value;
+      }
+    }
+
+    function clearDisplay() {
+      display.value = '0';
+      firstNumber = '';
+      operation = '';
+      newNumber = true;
+    }
+
+    function backspace() {
+      display.value = display.value.slice(0, -1);
+      if (display.value === '') {
+        display.value = '0';
+      }
+    }
+
+    function calculate() {
+      let expression = display.value;
+      
+      fetch('/calculator/calculate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
+        },
+        body: JSON.stringify({
+          expression: expression
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        display.value = data.result;
+        newNumber = true;
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        display.value = 'Erro';
+      });
+    }
+  </script>
+</body>
+</html> 
