@@ -186,126 +186,202 @@
     let previousNumber = '';
     let operation = '';
     let shouldResetDisplay = false;
+    let lastResult = null;
+
+    function formatNumber(num) {
+        // Limita a 8 dígitos e trata números decimais
+        if (typeof num === 'number') {
+            if (num.toString().includes('e')) {
+                return 'E'; // Erro para números muito grandes/pequenos
+            }
+            
+            let str = num.toString();
+            if (str.includes('.')) {
+                let [integer, decimal] = str.split('.');
+                if (integer.length > 8) return 'E';
+                if (integer.length + decimal.length > 8) {
+                    decimal = decimal.slice(0, 8 - integer.length - 1);
+                    return `${integer}.${decimal}`;
+                }
+            } else if (str.length > 8) {
+                return 'E';
+            }
+            return str;
+        }
+        return num;
+    }
 
     function updateDisplay(value) {
-      if (typeof value === 'number') {
-        // Limita o número de dígitos para 8
-        value = value.toString().slice(0, 8);
-      }
-      display.textContent = value;
+        display.textContent = formatNumber(value);
+        if (value < 0) {
+            document.querySelector('.minus-indicator').textContent = '-';
+        } else {
+            document.querySelector('.minus-indicator').textContent = '';
+        }
     }
 
     function appendNumber(num) {
-      if (shouldResetDisplay) {
-        currentNumber = '';
-        shouldResetDisplay = false;
-      }
-      if (currentNumber.length < 8) { // Limita entrada a 8 dígitos
-        currentNumber += num;
-        updateDisplay(currentNumber);
-      }
+        if (shouldResetDisplay) {
+            currentNumber = '';
+            shouldResetDisplay = false;
+        }
+        
+        // Previne múltiplos pontos decimais
+        if (num === '.' && currentNumber.includes('.')) {
+            return;
+        }
+        
+        // Limita o tamanho do número
+        if (currentNumber.length < 8) {
+            if (num === '.' && currentNumber === '') {
+                currentNumber = '0.';
+            } else {
+                currentNumber += num;
+            }
+            updateDisplay(parseFloat(currentNumber) || currentNumber);
+        }
     }
 
     function handleOperator(op) {
-      if (currentNumber !== '') {
-        if (previousNumber !== '') {
-          calculate();
+        if (currentNumber !== '') {
+            if (previousNumber !== '') {
+                calculate(true);
+            } else {
+                previousNumber = currentNumber;
+            }
+            operation = op;
+            shouldResetDisplay = true;
+        } else if (lastResult !== null) {
+            // Permite continuar calculando com o último resultado
+            previousNumber = lastResult.toString();
+            operation = op;
         }
-        previousNumber = currentNumber;
-        currentNumber = '';
-        operation = op;
-      }
     }
 
-    function calculate() {
-      if (previousNumber !== '' && currentNumber !== '') {
-        let result;
-        const prev = parseFloat(previousNumber);
-        const curr = parseFloat(currentNumber);
+    function calculate(chainOperation = false) {
+        if (previousNumber !== '' && (currentNumber !== '' || chainOperation)) {
+            const prev = parseFloat(previousNumber);
+            const curr = parseFloat(currentNumber || previousNumber);
+            let result;
 
-        switch(operation) {
-          case '+':
-            result = prev + curr;
-            break;
-          case '-':
-            result = prev - curr;
-            break;
-          case '*':
-            result = prev * curr;
-            break;
-          case '/':
-            result = curr !== 0 ? prev / curr : 'E';
-            break;
+            switch(operation) {
+                case '+':
+                    result = prev + curr;
+                    break;
+                case '-':
+                    result = prev - curr;
+                    break;
+                case '*':
+                    result = prev * curr;
+                    break;
+                case '/':
+                    result = curr !== 0 ? prev / curr : 'E';
+                    break;
+                default:
+                    return;
+            }
+
+            if (result === 'E' || isNaN(result) || !isFinite(result)) {
+                result = 'E';
+                previousNumber = '';
+                currentNumber = '';
+                operation = '';
+                lastResult = null;
+            } else {
+                lastResult = result;
+                if (!chainOperation) {
+                    previousNumber = '';
+                    currentNumber = '';
+                    operation = '';
+                } else {
+                    previousNumber = result.toString();
+                    currentNumber = '';
+                }
+            }
+            
+            updateDisplay(result);
+            shouldResetDisplay = true;
         }
-
-        updateDisplay(result);
-        previousNumber = result.toString();
-        currentNumber = '';
-        shouldResetDisplay = true;
-      }
     }
 
     function clearAll() {
-      currentNumber = '';
-      previousNumber = '';
-      operation = '';
-      memory = 0;
-      document.querySelector('.memory-indicator').textContent = '';
-      updateDisplay('0');
+        currentNumber = '';
+        previousNumber = '';
+        operation = '';
+        lastResult = null;
+        memory = 0;
+        document.querySelector('.memory-indicator').textContent = '';
+        document.querySelector('.minus-indicator').textContent = '';
+        updateDisplay('0');
     }
 
     function clearEntry() {
-      currentNumber = '';
-      updateDisplay('0');
+        currentNumber = '';
+        updateDisplay('0');
     }
 
     function handleMemory(action) {
-      const currentValue = parseFloat(display.textContent) || 0;
-      const memoryIndicator = document.querySelector('.memory-indicator');
-      
-      switch(action) {
-        case 'mrc':
-          if (memory !== 0) {
-            updateDisplay(memory);
-            currentNumber = memory.toString();
-            memory = 0;
-            memoryIndicator.textContent = '';
-          }
-          break;
-        case 'm+':
-          memory += currentValue;
-          memoryIndicator.textContent = 'M';
-          shouldResetDisplay = true;
-          break;
-        case 'm-':
-          memory -= currentValue;
-          memoryIndicator.textContent = 'M';
-          shouldResetDisplay = true;
-          break;
-      }
+        const currentValue = parseFloat(display.textContent) || 0;
+        const memoryIndicator = document.querySelector('.memory-indicator');
+        
+        switch(action) {
+            case 'mrc':
+                if (memory !== 0) {
+                    updateDisplay(memory);
+                    currentNumber = memory.toString();
+                    memory = 0;
+                    memoryIndicator.textContent = '';
+                }
+                break;
+            case 'm+':
+                memory += currentValue;
+                memoryIndicator.textContent = 'M';
+                shouldResetDisplay = true;
+                break;
+            case 'm-':
+                memory -= currentValue;
+                memoryIndicator.textContent = 'M';
+                shouldResetDisplay = true;
+                break;
+        }
     }
 
     function handleMath(action) {
-      const currentValue = parseFloat(display.textContent) || 0;
-      let result;
+        const currentValue = parseFloat(display.textContent) || 0;
+        let result;
 
-      switch(action) {
-        case 'sqrt':
-          result = Math.sqrt(currentValue);
-          break;
-        case 'percent':
-          result = currentValue / 100;
-          break;
-        case 'plusMinus':
-          result = -currentValue;
-          document.querySelector('.minus-indicator').textContent = 
-            currentValue > 0 ? '-' : '';
-          break;
-      }
+        switch(action) {
+            case 'sqrt':
+                if (currentValue < 0) {
+                    result = 'E';
+                } else {
+                    result = Math.sqrt(currentValue);
+                }
+                break;
+            case 'percent':
+                if (previousNumber !== '' && operation !== '') {
+                    const base = parseFloat(previousNumber);
+                    result = (base * currentValue) / 100;
+                } else {
+                    result = currentValue / 100;
+                }
+                break;
+            case 'plusMinus':
+                result = -currentValue;
+                break;
+        }
 
-      updateDisplay(result);
-      currentNumber = result.toString();
-      shouldResetDisplay = true;
+        if (result === 'E' || isNaN(result) || !isFinite(result)) {
+            result = 'E';
+            previousNumber = '';
+            currentNumber = '';
+            operation = '';
+        } else {
+            currentNumber = result.toString();
+        }
+        
+        updateDisplay(result);
+        shouldResetDisplay = true;
     }
   </script>
 </body>
