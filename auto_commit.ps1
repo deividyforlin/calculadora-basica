@@ -9,7 +9,7 @@ function Show-Notification {
     $balloon.Icon = [System.Drawing.Icon]::ExtractAssociatedIcon($path)
     $balloon.BalloonTipIcon = [System.Windows.Forms.ToolTipIcon]::Info
     $balloon.BalloonTipText = $Message
-    $balloon.BalloonTipTitle = "Auto Commit"
+    $balloon.BalloonTipTitle = "Git Monitor"
     $balloon.Visible = $true
     $balloon.ShowBalloonTip(5000)
 }
@@ -19,7 +19,7 @@ function Get-GitStatus {
     return $status
 }
 
-function Auto-Commit {
+function Start-GitMonitor {
     while ($true) {
         $changes = Get-GitStatus
         if ($changes) {
@@ -47,7 +47,7 @@ function Auto-Commit {
 if (Test-Path .git) {
     Write-Host "Monitorando alterações a cada $timeInterval minutos..."
     Write-Host "Pressione Ctrl+C para parar."
-    Auto-Commit
+    Start-GitMonitor
 } else {
     Write-Host "Este diretório não é um repositório Git!"
 } 
