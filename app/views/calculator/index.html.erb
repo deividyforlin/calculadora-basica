@@ -1,166 +1,311 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Calculadora</title>
+  <title>Calculadora Casio</title>
   <style>
-    .calculator {
-      width: 300px;
-      margin: 50px auto;
-      padding: 20px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      background-color: #f9f9f9;
-    }
-
-    h1 {
-      text-align: center;
-      color: #333;
-      margin-bottom: 20px;
+    body {
+      background-color: #f0f0f0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
       font-family: Arial, sans-serif;
     }
 
-    .display {
-      width: 100%;
-      height: 50px;
-      margin-bottom: 20px;
-      padding: 10px;
+    .calculator {
+      width: 250px;
+      background-color: #3a3a3a;
+      padding: 15px;
+      border-radius: 6px;
+      box-shadow: 
+        inset 0 0 15px rgba(0,0,0,0.3),
+        0 4px 8px rgba(0,0,0,0.3);
+    }
+
+    .brand {
+      color: white;
+      text-align: center;
+      margin-bottom: 5px;
       font-size: 24px;
-      text-align: right;
-      border: 1px solid #ddd;
-      border-radius: 3px;
-      background-color: white;
+      font-weight: bold;
+      letter-spacing: 1px;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    }
+
+    .model {
+      color: #ddd;
+      text-align: center;
+      font-size: 12px;
+      margin-bottom: 15px;
+      letter-spacing: 0.5px;
+    }
+
+    .display-container {
+      background-color: #444;
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: 4px;
+    }
+
+    .display {
+      background-color: #c8d9d3;
+      height: 45px;
+      border: 1px solid #555;
+      border-radius: 2px;
+      position: relative;
+      box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+    }
+
+    .display-text {
+      position: absolute;
+      right: 10px;
+      bottom: 5px;
+      font-family: 'Digital-7', 'Calculator', monospace;
+      font-size: 32px;
+      color: #333;
+    }
+
+    .indicators {
+      position: absolute;
+      left: 10px;
+      top: 5px;
+      font-size: 10px;
+      color: #333;
     }
 
     .buttons {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
+      gap: 8px;
     }
 
     button {
-      padding: 15px;
-      font-size: 18px;
-      border: 1px solid #ddd;
-      border-radius: 3px;
-      background-color: white;
-      cursor: pointer;
-      transition: background-color 0.2s;
-    }
-
-    button:hover {
-      background-color: #eee;
-    }
-
-    .operator {
-      background-color: #f0f0f0;
-    }
-
-    .equals {
-      background-color: #2ecc71;
+      height: 40px;
+      font-size: 16px;
+      border: 1px solid #222;
+      border-radius: 4px;
+      background: linear-gradient(to bottom, #444, #333);
       color: white;
-      transition: all 0.3s ease;
+      cursor: pointer;
+      box-shadow: 
+        0 2px 4px rgba(0,0,0,0.2),
+        inset 0 1px 0 rgba(255,255,255,0.1);
+      text-shadow: 0 -1px 0 rgba(0,0,0,0.4);
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    .equals:hover {
-      background-color: #27ae60;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    button:active {
+      background: linear-gradient(to bottom, #333, #2a2a2a);
+      box-shadow: 
+        inset 0 2px 4px rgba(0,0,0,0.3);
+      transform: translateY(1px);
+    }
+
+    .memory {
+      background: linear-gradient(to bottom, #2c2c2c, #222);
+      font-size: 14px;
     }
 
     .clear {
-      background-color: #ff4444;
-      color: white;
+      background: linear-gradient(to bottom, #8b2323, #6b1b1b);
     }
 
-    .clear:hover {
-      background-color: #ff3333;
+    .clear:active {
+      background: linear-gradient(to bottom, #6b1b1b, #5a1515);
+    }
+
+    .operator {
+      background: linear-gradient(to bottom, #3a3a3a, #2a2a2a);
+    }
+
+    .number {
+      background: linear-gradient(to bottom, #4a4a4a, #3a3a3a);
+    }
+
+    @font-face {
+      font-family: 'Calculator';
+      src: url('https://fonts.cdnfonts.com/css/calculator') format('woff2');
     }
   </style>
 </head>
 <body>
-  <h1>Calculadora Ruby on Rails</h1>
   <div class="calculator">
-    <input type="text" class="display" id="display" readonly>
+    <div class="brand">CASIO</div>
+    <div class="model">ELECTRONIC CALCULATOR HL-4A</div>
+    <div class="display-container">
+      <div class="display">
+        <div class="indicators">
+          <span class="minus-indicator"></span>
+          <span class="memory-indicator"></span>
+        </div>
+        <div class="display-text" id="display">0</div>
+      </div>
+    </div>
     <div class="buttons">
-      <button onclick="clearDisplay()" class="clear">C</button>
-      <button onclick="appendToDisplay('(')">(</button>
-      <button onclick="appendToDisplay(')')">)</button>
-      <button onclick="appendToDisplay('/')" class="operator">÷</button>
-      
-      <button onclick="appendToDisplay('7')">7</button>
-      <button onclick="appendToDisplay('8')">8</button>
-      <button onclick="appendToDisplay('9')">9</button>
-      <button onclick="appendToDisplay('*')" class="operator">×</button>
-      
-      <button onclick="appendToDisplay('4')">4</button>
-      <button onclick="appendToDisplay('5')">5</button>
-      <button onclick="appendToDisplay('6')">6</button>
-      <button onclick="appendToDisplay('-')" class="operator">-</button>
-      
-      <button onclick="appendToDisplay('1')">1</button>
-      <button onclick="appendToDisplay('2')">2</button>
-      <button onclick="appendToDisplay('3')">3</button>
-      <button onclick="appendToDisplay('+')" class="operator">+</button>
-      
-      <button onclick="appendToDisplay('0')">0</button>
-      <button onclick="appendToDisplay('.')">.</button>
-      <button onclick="backspace()">⌫</button>
+      <button onclick="handleMemory('mrc')" class="memory">MRC</button>
+      <button onclick="handleMemory('m-')" class="memory">M-</button>
+      <button onclick="handleMemory('m+')" class="memory">M+</button>
+      <button onclick="handleMath('sqrt')" class="operator">√</button>
+
+      <button onclick="clearAll()" class="clear">ON</button>
+      <button onclick="clearEntry()" class="clear">C</button>
+      <button onclick="handleMath('plusMinus')" class="operator">±</button>
+      <button onclick="handleMath('percent')" class="operator">%</button>
+
+      <button onclick="appendNumber('7')" class="number">7</button>
+      <button onclick="appendNumber('8')" class="number">8</button>
+      <button onclick="appendNumber('9')" class="number">9</button>
+      <button onclick="handleOperator('/')" class="operator">÷</button>
+
+      <button onclick="appendNumber('4')" class="number">4</button>
+      <button onclick="appendNumber('5')" class="number">5</button>
+      <button onclick="appendNumber('6')" class="number">6</button>
+      <button onclick="handleOperator('*')" class="operator">×</button>
+
+      <button onclick="appendNumber('1')" class="number">1</button>
+      <button onclick="appendNumber('2')" class="number">2</button>
+      <button onclick="appendNumber('3')" class="number">3</button>
+      <button onclick="handleOperator('-')" class="operator">-</button>
+
+      <button onclick="appendNumber('0')" class="number">0</button>
+      <button onclick="appendNumber('.')" class="number">.</button>
       <button onclick="calculate()" class="equals">=</button>
+      <button onclick="handleOperator('+')" class="operator">+</button>
     </div>
   </div>
 
   <script>
     let display = document.getElementById('display');
-    let firstNumber = '';
+    let memory = 0;
+    let currentNumber = '';
+    let previousNumber = '';
     let operation = '';
-    let newNumber = true;
+    let shouldResetDisplay = false;
 
-    function appendToDisplay(value) {
-      if (display.value === '0' || newNumber) {
-        display.value = value;
-        newNumber = false;
-      } else {
-        display.value += value;
+    function updateDisplay(value) {
+      if (typeof value === 'number') {
+        // Limita o número de dígitos para 8
+        value = value.toString().slice(0, 8);
+      }
+      display.textContent = value;
+    }
+
+    function appendNumber(num) {
+      if (shouldResetDisplay) {
+        currentNumber = '';
+        shouldResetDisplay = false;
+      }
+      if (currentNumber.length < 8) { // Limita entrada a 8 dígitos
+        currentNumber += num;
+        updateDisplay(currentNumber);
       }
     }
 
-    function clearDisplay() {
-      display.value = '0';
-      firstNumber = '';
-      operation = '';
-      newNumber = true;
-    }
-
-    function backspace() {
-      display.value = display.value.slice(0, -1);
-      if (display.value === '') {
-        display.value = '0';
+    function handleOperator(op) {
+      if (currentNumber !== '') {
+        if (previousNumber !== '') {
+          calculate();
+        }
+        previousNumber = currentNumber;
+        currentNumber = '';
+        operation = op;
       }
     }
 
     function calculate() {
-      let expression = display.value;
+      if (previousNumber !== '' && currentNumber !== '') {
+        let result;
+        const prev = parseFloat(previousNumber);
+        const curr = parseFloat(currentNumber);
+
+        switch(operation) {
+          case '+':
+            result = prev + curr;
+            break;
+          case '-':
+            result = prev - curr;
+            break;
+          case '*':
+            result = prev * curr;
+            break;
+          case '/':
+            result = curr !== 0 ? prev / curr : 'E';
+            break;
+        }
+
+        updateDisplay(result);
+        previousNumber = result.toString();
+        currentNumber = '';
+        shouldResetDisplay = true;
+      }
+    }
+
+    function clearAll() {
+      currentNumber = '';
+      previousNumber = '';
+      operation = '';
+      memory = 0;
+      document.querySelector('.memory-indicator').textContent = '';
+      updateDisplay('0');
+    }
+
+    function clearEntry() {
+      currentNumber = '';
+      updateDisplay('0');
+    }
+
+    function handleMemory(action) {
+      const currentValue = parseFloat(display.textContent) || 0;
+      const memoryIndicator = document.querySelector('.memory-indicator');
       
-      fetch('/calculator/calculate', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
-        },
-        body: JSON.stringify({
-          expression: expression
-        })
-      })
-      .then(response => response.json())
-      .then(data => {
-        display.value = data.result;
-        newNumber = true;
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        display.value = 'Erro';
-      });
+      switch(action) {
+        case 'mrc':
+          if (memory !== 0) {
+            updateDisplay(memory);
+            currentNumber = memory.toString();
+            memory = 0;
+            memoryIndicator.textContent = '';
+          }
+          break;
+        case 'm+':
+          memory += currentValue;
+          memoryIndicator.textContent = 'M';
+          shouldResetDisplay = true;
+          break;
+        case 'm-':
+          memory -= currentValue;
+          memoryIndicator.textContent = 'M';
+          shouldResetDisplay = true;
+          break;
+      }
+    }
+
+    function handleMath(action) {
+      const currentValue = parseFloat(display.textContent) || 0;
+      let result;
+
+      switch(action) {
+        case 'sqrt':
+          result = Math.sqrt(currentValue);
+          break;
+        case 'percent':
+          result = currentValue / 100;
+          break;
+        case 'plusMinus':
+          result = -currentValue;
+          document.querySelector('.minus-indicator').textContent = 
+            currentValue > 0 ? '-' : '';
+          break;
+      }
+
+      updateDisplay(result);
+      currentNumber = result.toString();
+      shouldResetDisplay = true;
     }
   </script>
 </body>
